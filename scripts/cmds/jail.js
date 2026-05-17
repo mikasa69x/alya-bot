@@ -1,166 +1,73 @@
-const { createCanvas, loadImage } = require('canvas');
-const fs = require('fs-extra');
-const path = require('path');
-const request = require('request');
+const fs = require("fs-extra");
+const axios = require("axios");
+const { loadImage, createCanvas } = require("canvas");
 
-module.exports.config = {
-  name: "jail",
-  version: "8.0",
-  author: "MOHAMMAD AKASH",
-  countDown: 10,
-  role: 0,
-  shortDescription: "Wanted with thin bars",
-  category: "fun",
-  guide: { en: "{p}jail @tag" }
-};
+const JAIL_URL = "https://i.ibb.co.com/84f1gzcJ/pngtree-jail-prison-bars-vector-png-image-6665843.png";
 
-module.exports.onStart = async function ({ api, event, args, usersData }) {
-  const { threadID, messageID, mentions } = event;
+module.exports = {
+  config: {
+    name: "jail",
+    version: "1.0.0",
+    author: "EryXenX",
+    countDown: 5,
+    role: 0,
+    description: {
+      en: "Put someone behind jail bars",
+      bn: "কাউকে জেলের গ্রিলের পেছনে বসাও",
+      hi: "Kisi ko jail ke peeche daalo",
+      tl: "Ilagay ang isa sa likod ng rehas ng bilangguan",
+      ar: "ضع شخصاً خلف قضبان السجن"
+    },
+    category: "fun",
+    guide: { en: "{pn} @mention or reply to a message" }
+  },
 
-  let uid;
-  let name = "Wanted";
+  langs: {
+    en: { noMention: "❌ | Mention someone or reply to a message!", error: "❌ | Failed to generate. Try again." },
+    bn: { noMention: "❌ | কাউকে mention করুন বা reply করুন!", error: "❌ | তৈরি করতে সমস্যা হয়েছে।" },
+    hi: { noMention: "❌ | Kisi ko mention karein ya reply karein!", error: "❌ | Banana fail hua." },
+    tl: { noMention: "❌ | Mag-mention ng isa o mag-reply!", error: "❌ | Hindi nagawa." },
+    ar: { noMention: "❌ | أشر إلى شخص أو رد على رسالة!", error: "❌ | فشل الإنشاء." }
+  },
 
-  if (Object.keys(mentions).length === 0) {
-    uid = event.senderID;
-  } else {
-    uid = Object.keys(mentions)[0];
-    name = mentions[uid];
-  }
+  onStart: async function ({ event, message, getLang }) {
+    try {
+      const mentionID = Object.keys(event.mentions)[0] || (event.messageReply ? event.messageReply.senderID : null);
+      if (!mentionID) return message.reply(getLang("noMention"));
 
-  try {
-    name = await usersData.getName(uid);
+      const ts = Date.now();
+      const jailPath = __dirname + "/cache/jail_base_" + ts + ".png";
+      const avatarPath = __dirname + "/cache/jail_avt_" + ts + ".jpg";
+      const outputPath = __dirname + "/cache/jail_out_" + ts + ".jpg";
 
-    const avatarCache = path.join(__dirname, 'cache', `wanted_avatar_${uid}.jpg`);
-    const jailCache = path.join(__dirname, 'cache', `wanted_output_${Date.now()}.png`);
+      const [jailRes, avatarRes] = await Promise.all([
+        axios.get(JAIL_URL, { responseType: "arraybuffer" }),
+        axios.get("https://graph.facebook.com/" + mentionID + "/picture?height=720&width=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662", { responseType: "arraybuffer" })
+      ]);
 
-    const imageUrl = `https://graph.facebook.com/${uid}/picture?height=1500&width=1500&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
+      fs.writeFileSync(jailPath, Buffer.from(jailRes.data));
+      fs.writeFileSync(avatarPath, Buffer.from(avatarRes.data));
 
-    const downloadCallback = async () => {
-      if (fs.existsSync(avatarCache)) {
-        const stats = fs.statSync(avatarCache);
-        if (stats.size < 10000) {
-          const defaultUrl = "https://imgur.com/8Q2Z3tI.png";
-          request(encodeURI(defaultUrl))
-            .pipe(fs.createWriteStream(avatarCache))
-            .on("close", generateWanted);
-        } else {
-          generateWanted();
-        }
-      }
-    };
+      const jailImg = await loadImage(jailPath);
+      const avatarImg = await loadImage(avatarPath);
 
-    const generateWanted = async () => {
-      try {
-        const wantedPath = await generateThinBarsImage(avatarCache, name);
-        api.sendMessage({
-          body: `@${name} WANTED! 🔒 Locked Up! (Clear view)`,
-          mentions: [{ tag: name, id: uid }],
-          attachment: fs.createReadStream(wantedPath)
-        }, threadID, messageID);
+      const W = jailImg.width;
+      const H = jailImg.height;
+      const canvas = createCanvas(W, H);
+      const ctx = canvas.getContext("2d");
 
-        setTimeout(() => {
-          [avatarCache, wantedPath].forEach(file => fs.existsSync(file) && fs.unlinkSync(file));
-        }, 10000);
-      } catch (genErr) {
-        api.sendMessage("⚠️ Poster error!", threadID, messageID);
-      }
-    };
+      ctx.drawImage(avatarImg, 0, 0, W, H);
+      ctx.drawImage(jailImg, 0, 0, W, H);
 
-    request(encodeURI(imageUrl))
-      .pipe(fs.createWriteStream(avatarCache))
-      .on("close", downloadCallback)
-      .on("error", () => {
-        const defaultUrl = "https://i.imgur.com/8Q2Z3tI.png";
-        request(encodeURI(defaultUrl))
-          .pipe(fs.createWriteStream(avatarCache))
-          .on("close", generateWanted);
-      });
+      fs.writeFileSync(outputPath, canvas.toBuffer("image/jpeg", { quality: 0.92 }));
 
-  } catch (error) {
-    console.error("Wanted Error:", error);
-    api.sendMessage("⚠️ Can't create! Using default.", threadID, messageID);
+      await message.reply({ body: "🔒 You are in jail!", attachment: fs.createReadStream(outputPath) });
+
+      [jailPath, avatarPath, outputPath].forEach(p => { try { fs.unlinkSync(p); } catch (_) {} });
+
+    } catch (err) {
+      console.error("Jail Error:", err);
+      message.reply(getLang("error"));
+    }
   }
 };
-
-// === Thin Bars + Clear Pic ===
-async function generateThinBarsImage(avatarPath, name) {
-  const avatar = await loadImage(avatarPath);
-  const width = 600;
-  const height = 800;
-  const canvas = createCanvas(width, height);
-  const ctx = canvas.getContext('2d');
-
-  // Dark Blue BG
-  ctx.fillStyle = '#0f172a';
-  ctx.fillRect(0, 0, width, height);
-
-  // WANTED
-  ctx.font = 'bold 100px Arial';
-  ctx.fillStyle = '#ef4444';
-  ctx.textAlign = 'center';
-  ctx.shadowColor = '#991b1b';
-  ctx.shadowBlur = 20;
-  ctx.fillText('WANTED', width / 2, 120);
-  ctx.shadowColor = 'transparent';
-
-  // Avatar Circle (Clear)
-  const centerX = width / 2;
-  const centerY = height / 2 + 20;
-  const radius = 200; // Bigger for clear view
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-  ctx.clip();
-  ctx.drawImage(avatar, centerX - radius, centerY - radius, radius * 2, radius * 2);
-  ctx.restore();
-
-  // Thin Bars (On Top, Semi-Transparent for Clear Pic)
-  ctx.globalAlpha = 0.8; // Halka for clear pic
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = 20; // Chikon
-  ctx.lineCap = 'round';
-
-  // Vertical Bars
-  const barCount = 8;
-  const barSpacing = width / (barCount + 1);
-  for (let i = 1; i <= barCount; i++) {
-    const x = i * barSpacing;
-    ctx.beginPath();
-    ctx.moveTo(x, 180);
-    ctx.lineTo(x, height - 180);
-    ctx.stroke();
-  }
-
-  // Horizontal Bars (Thin)
-  ctx.lineWidth = 18;
-  ctx.beginPath();
-  ctx.moveTo(barSpacing, 260);
-  ctx.lineTo(width - barSpacing, 260);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(barSpacing, height - 260);
-  ctx.lineTo(width - barSpacing, height - 260);
-  ctx.stroke();
-
-  ctx.globalAlpha = 1.0; // Reset
-
-  // Locked Up!
-  ctx.font = 'italic 50px "Segoe UI"';
-  ctx.fillStyle = '#ffffff';
-  ctx.shadowColor = '#60a5fa';
-  ctx.shadowBlur = 20;
-  ctx.fillText('Locked Up!', width / 2, height - 100);
-  ctx.shadowColor = 'transparent';
-
-  // Name
-  ctx.font = 'bold 40px Arial';
-  ctx.fillStyle = '#cbd5e1';
-  ctx.fillText(name.toUpperCase(), width / 2, height - 50);
-
-  // Save
-  const wantedPath = path.join(__dirname, 'cache', `wanted_thin_${Date.now()}.png`);
-  fs.writeFileSync(wantedPath, canvas.toBuffer());
-  return wantedPath;
-}
