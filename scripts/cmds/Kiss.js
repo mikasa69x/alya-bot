@@ -13,13 +13,13 @@ const avatarConfig = {
 
 module.exports = {
   config: {
-    name: "kiss3",
+    name: "kiss",
     version: "4.0",
     author: "Siyuuu",
     countDown: 5,
     role: 0,
     description:
-      "💋 Create a romantic kiss image between you and your tagged partner!",
+      " Create a romantic kiss image between you and your tagged partner!",
     category: "love",
     guide: {
       en: "{pn} @tag or reply to someone's message"
