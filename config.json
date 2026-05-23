@@ -155,7 +155,7 @@
     "notes": "Docs: https://github.com/ntkhang03/fb-chat-api/blob/master/DOCS.md#apisetoptionsoptions"
   },
   "noPrefix": {
-    "enable": false,
+    "enable": true,
     "notes": "true = only bot admins can use commands without prefix | false = everyone must use prefix"
   }
 }
