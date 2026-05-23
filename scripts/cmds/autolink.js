@@ -48,7 +48,6 @@ module.exports = {
                         body:
 `📥 ᴠɪᴅᴇᴏ ᴅᴏᴡɴʟᴏᴀᴅᴇᴅ  
 ━━━━━━━━━━━━━━━  
-🎬 ᴛɪᴛʟᴇ: ${title || "Video File"}  
 📦 sɪᴢᴇ: ${fileSizeInMB.toFixed(2)} MB  
 ━━━━━━━━━━━━━━━`,
                         attachment: fs.createReadStream(filePath)
