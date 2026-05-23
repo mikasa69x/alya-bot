@@ -95,11 +95,7 @@ module.exports = {
     }
 
     msg += `\nUse: ${prefix}help <command>`;
-
-    const gifURLs = [
-      "",
-      "",
-      ""
+    
     ];
 
     const randomGifURL = gifURLs[Math.floor(Math.random() * gifURLs.length)];
