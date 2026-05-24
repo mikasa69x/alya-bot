@@ -5,8 +5,8 @@ const path = require('path');
 
 module.exports = {
     config: {
-        name: "ping2",
-        aliases: ["pong2"],
+        name: "ping",
+        aliases: ["pong"],
         version: "4.1",
         author: "xalman",
         category: "system",
