@@ -15,7 +15,7 @@ const typing = async (api, threadID, ms = 3000) => {
 module.exports = {
   config: {
     name: "baby",
-    aliases: ["mari", "maria", "hippi", "xan", "bby", "bbz"],
+    aliases: ["makima", "mikasa", "alya", "Shifa❤️‍🩹", "bby", "bot"],
     version: "3.6",
     author: "rX (fixed by GPT)",
     countDown: 0,
@@ -38,7 +38,7 @@ module.exports = {
       // no text => random reply
       if (!query) {
         await typing(api, threadID, 2000);
-        const ran = ["Bolo baby 💖", "Hea baby 😚", "Yes I'm here 😘", "Ki khobor janu? 🥰"];
+        const ran = ["Bolo baby 💖", "Hea baby 😚", "Yes I'm here 😘", "Ki khobor janu? "];
         return message.reply(ran[Math.floor(Math.random() * ran.length)], (err, info) => {
           if (!err) global.GoatBot.onReply.set(info.messageID, { commandName: "baby" });
         });
@@ -162,7 +162,7 @@ ${formatted}`
 
     try {
       // triggers only
-      const triggers = ["baby","bby","xan","bbz","mari","মারিয়া","bot"];
+      const triggers = ["baby","bby","Shifa❤️‍🩹","alya","mikasa","makima","bot"];
       if (triggers.includes(raw)) {
         await typing(api, threadID, 5000);
         const funny = [
