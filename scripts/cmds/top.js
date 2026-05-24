@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const moment = require("moment-timezone");
 const { createCanvas, loadImage, registerFont } = require("canvas");
 const axios = require("axios");
 
@@ -8,8 +7,7 @@ try {
     registerFont('./fonts/Poppins-Bold.ttf', { family: 'Poppins', weight: 'bold' });
     registerFont('./fonts/Poppins-Regular.ttf', { family: 'Poppins', weight: 'normal' });
     registerFont('./fonts/Orbitron-Bold.ttf', { family: 'Orbitron', weight: 'bold' });
-} catch (e) {
-}
+} catch (e) {}
 
 function formatMoney(value) {
     value = Number(value);
@@ -84,7 +82,7 @@ function roundRect(ctx, x, y, width, height, radius) {
 }
 
 async function drawTopBoard(users, usersData) {
-    const W = 1200, H = 1600;
+    const W = 1200, H = 1380; // Height reduced after removing footer
     const canvas = createCanvas(W, H);
     const ctx = canvas.getContext("2d");
 
@@ -97,7 +95,7 @@ async function drawTopBoard(users, usersData) {
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, W, H);
 
-        // Animated-style particles with glow - reduced count
+        // Particles
         for (let i = 0; i < 150; i++) {
             const x = Math.random() * W;
             const y = Math.random() * H;
@@ -114,7 +112,7 @@ async function drawTopBoard(users, usersData) {
         }
         ctx.shadowBlur = 0;
 
-        // Top decorative line with glow
+        // Top decorative line
         const lineGrad = ctx.createLinearGradient(0, 0, W, 0);
         lineGrad.addColorStop(0, "transparent");
         lineGrad.addColorStop(0.2, "#00d4ff");
@@ -132,7 +130,7 @@ async function drawTopBoard(users, usersData) {
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // Title - smaller and higher
+        // Title
         ctx.save();
         ctx.shadowColor = "#ff00ff";
         ctx.shadowBlur = 30;
@@ -147,28 +145,18 @@ async function drawTopBoard(users, usersData) {
         ctx.fillText("TOP 15 ELITE BILLIONAIRE USERS", W/2, 65);
         ctx.restore();
 
-        // Subtitle - smaller
-        ctx.font = "italic 24px 'Poppins', Arial";
-        ctx.fillStyle = "rgba(255,255,255,0.6)";
-        ctx.fillText("", W/2, 95);
-
-        // Top 3 positions - COMPACT
+        // Top 3 positions
         const positions = [
-            { x: W/2 - 80, y: 130, size: 160, color: "#ffd700", glow: "#ffaa00", rank: 1 },   // Center - smaller
-            { x: W/2 - 350, y: 200, size: 130, color: "#c0c0c0", glow: "#a0a0a0", rank: 2 },  // Left - smaller
-            { x: W/2 + 200, y: 200, size: 130, color: "#cd7f32", glow: "#b87333", rank: 3 },  // Right - smaller
+            { x: W/2 - 80, y: 130, size: 160, color: "#ffd700", glow: "#ffaa00", rank: 1 },
+            { x: W/2 - 350, y: 200, size: 130, color: "#c0c0c0", glow: "#a0a0a0", rank: 2 },
+            { x: W/2 + 200, y: 200, size: 130, color: "#cd7f32", glow: "#b87333", rank: 3 },
         ];
         
-        // Draw top 3 users
         for (let i = 0; i < 3 && i < users.length; i++) {
-            try {
-                await drawTopThreeCompact(ctx, users[i], positions[i], usersData);
-            } catch (e) {
-                console.log(`Error drawing top player ${i}:`, e);
-            }
+            await drawTopThreeCompact(ctx, users[i], positions[i], usersData);
         }
 
-        // Divider line - moved up
+        // Divider line
         ctx.strokeStyle = "rgba(255,255,255,0.2)";
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -176,49 +164,17 @@ async function drawTopBoard(users, usersData) {
         ctx.lineTo(W - 100, 420);
         ctx.stroke();
 
-        // Compact cards for 4-15
+        // Compact cards for 4-15 (Full 15 users)
         const startY = 435;
-        const cardHeight = 60; // Reduced from 75
-        const gap = 8; // Reduced from 12
+        const cardHeight = 60;
+        const gap = 8;
         
-        for (let i = 3; i < users.length; i++) {
-            try {
-                const y = startY + (i-3) * (cardHeight + gap);
-                await drawCompactCard(ctx, users[i], i+1, y, usersData, W);
-            } catch (e) {
-                console.log(`Error drawing rank card ${i}:`, e);
-            }
+        for (let i = 3; i < 15 && i < users.length; i++) {
+            const y = startY + (i-3) * (cardHeight + gap);
+            await drawCompactCard(ctx, users[i], i+1, y, usersData, W);
         }
 
-        // Bottom section - compact
-        const footerY = H - 80;
-        
-        // Gradient line
-        ctx.shadowColor = "#ff00ff";
-        ctx.shadowBlur = 15;
-        const footerGrad = ctx.createLinearGradient(200, 0, W-200, 0);
-        footerGrad.addColorStop(0, "transparent");
-        footerGrad.addColorStop(0.5, "rgba(0,212,255,0.8)");
-        footerGrad.addColorStop(1, "transparent");
-        ctx.strokeStyle = footerGrad;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(200, footerY);
-        ctx.lineTo(W - 200, footerY);
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-
-        // Stats - smaller
-        ctx.font = "bold 24px 'Poppins', Arial";
-        ctx.fillStyle = "#00d4ff";
-        ctx.textAlign = "center";
-        ctx.fillText(`Total Users: ${usersData.getAll ? (await usersData.getAll()).length : 'N/A'}`, W/2, footerY + 30);
-        
-        ctx.font = "18px 'Poppins', Arial";
-        ctx.fillStyle = "rgba(255,255,255,0.5)";
-        ctx.fillText(`${moment().tz("Asia/Dhaka").format("YYYY-MM-DD | hh:mm:ss A")}`, W/2, footerY + 55);
-
-        // Save with high quality
+        // Save
         const cacheDir = path.join(__dirname, "cache");
         if (!fs.existsSync(cacheDir)) {
             fs.mkdirSync(cacheDir, { recursive: true });
@@ -227,7 +183,7 @@ async function drawTopBoard(users, usersData) {
         const fileName = `top_money_${Date.now()}.png`;
         const filePath = path.join(cacheDir, fileName);
         
-        const buffer = canvas.toBuffer("image/png", { compressionLevel: 3, filters: canvas.PNG_FILTER_NONE });
+        const buffer = canvas.toBuffer("image/png", { compressionLevel: 3 });
         fs.writeFileSync(filePath, buffer);
         
         return filePath;
@@ -238,6 +194,7 @@ async function drawTopBoard(users, usersData) {
     }
 }
 
+// drawTopThreeCompact এবং drawCompactCard ফাংশন আগের মতোই রাখা হয়েছে
 async function drawTopThreeCompact(ctx, user, pos, usersData) {
     try {
         const avatar = await fetchAvatar(user.userID, usersData);
@@ -245,7 +202,6 @@ async function drawTopThreeCompact(ctx, user, pos, usersData) {
         const centerX = x + size/2;
         const centerY = y + size/2;
 
-        // Outer glow ring - thinner
         ctx.shadowColor = glow;
         ctx.shadowBlur = 30;
         ctx.beginPath();
@@ -254,7 +210,6 @@ async function drawTopThreeCompact(ctx, user, pos, usersData) {
         ctx.lineWidth = 4;
         ctx.stroke();
         
-        // Inner glow
         ctx.shadowBlur = 10;
         ctx.beginPath();
         ctx.arc(centerX, centerY, size/2 + 8, 0, Math.PI*2);
@@ -263,7 +218,6 @@ async function drawTopThreeCompact(ctx, user, pos, usersData) {
         ctx.stroke();
         ctx.shadowBlur = 0;
 
-        // Avatar with clip
         ctx.save();
         ctx.beginPath();
         ctx.arc(centerX, centerY, size/2, 0, Math.PI*2);
@@ -273,7 +227,6 @@ async function drawTopThreeCompact(ctx, user, pos, usersData) {
         ctx.fillRect(x, y, size, size);
         ctx.drawImage(avatar, x, y, size, size);
         
-        // Glass overlay
         const glassGrad = ctx.createLinearGradient(0, y + size*0.6, 0, y + size);
         glassGrad.addColorStop(0, "transparent");
         glassGrad.addColorStop(1, "rgba(0,0,0,0.4)");
@@ -282,7 +235,6 @@ async function drawTopThreeCompact(ctx, user, pos, usersData) {
         
         ctx.restore();
 
-        // Rank text - smaller
         ctx.font = "bold 26px 'Orbitron', Arial";
         ctx.fillStyle = color;
         ctx.textAlign = "center";
@@ -292,7 +244,6 @@ async function drawTopThreeCompact(ctx, user, pos, usersData) {
         ctx.fillText(`#${rank}`, centerX, y + size + 25);
         ctx.shadowBlur = 0;
 
-        // Name - smaller
         ctx.shadowColor = "rgba(255,255,255,0.5)";
         ctx.shadowBlur = 8;
         ctx.font = "bold 24px 'Poppins', Arial";
@@ -303,7 +254,6 @@ async function drawTopThreeCompact(ctx, user, pos, usersData) {
         ctx.fillText(displayName, centerX, y + size + 55);
         ctx.shadowBlur = 0;
 
-        // Money - smaller
         ctx.font = "bold 20px 'Poppins', Arial";
         ctx.fillStyle = color;
         ctx.fillText(`${formatMoney(user.money || 0)}`, centerX, y + size + 80);
@@ -313,16 +263,14 @@ async function drawTopThreeCompact(ctx, user, pos, usersData) {
     }
 }
 
-// Compact card for 4-15
 async function drawCompactCard(ctx, user, rank, y, usersData, W) {
     try {
         const x = 60;
         const w = W - 120;
-        const h = 60; // Reduced height
+        const h = 60;
         const avatar = await fetchAvatar(user.userID, usersData);
-        const avatarSize = 45; // Reduced from 55
+        const avatarSize = 45;
 
-        // Subtle glass background
         const glassGrad = ctx.createLinearGradient(x, y, x + w, y + h);
         glassGrad.addColorStop(0, "rgba(255,255,255,0.05)");
         glassGrad.addColorStop(0.5, "rgba(255,255,255,0.02)");
@@ -332,7 +280,6 @@ async function drawCompactCard(ctx, user, rank, y, usersData, W) {
         roundRect(ctx, x, y, w, h, 12);
         ctx.fill();
         
-        // Single accent line on left - thinner
         const rankColors = {
             4: "#00d4ff", 5: "#00d4ff", 6: "#00d4ff",
             7: "#ff6b6b", 8: "#ff6b6b", 9: "#ff6b6b",
@@ -344,14 +291,12 @@ async function drawCompactCard(ctx, user, rank, y, usersData, W) {
         ctx.fillStyle = accentColor;
         ctx.fillRect(x, y + 8, 3, h - 16);
 
-        // Rank number - smaller
         ctx.font = "bold 22px 'Orbitron', Arial";
         ctx.fillStyle = accentColor;
         ctx.textAlign = "left";
         ctx.textBaseline = "middle";
         ctx.fillText(`#${rank}`, x + 15, y + h/2);
 
-        // Avatar with subtle ring - smaller
         const avatarX = x + 65;
         const avatarY = y + 7;
         
@@ -362,14 +307,12 @@ async function drawCompactCard(ctx, user, rank, y, usersData, W) {
         ctx.drawImage(avatar, avatarX, avatarY, avatarSize, avatarSize);
         ctx.restore();
         
-        // Avatar ring - thinner
         ctx.beginPath();
         ctx.arc(avatarX + avatarSize/2, avatarY + avatarSize/2, avatarSize/2 + 1, 0, Math.PI*2);
         ctx.strokeStyle = accentColor;
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Name - smaller
         ctx.font = "bold 22px 'Poppins', Arial";
         ctx.fillStyle = "#fff";
         ctx.textAlign = "left";
@@ -377,7 +320,6 @@ async function drawCompactCard(ctx, user, rank, y, usersData, W) {
         const displayName = user.name && user.name.length > 18 ? user.name.slice(0, 16) + ".." : (user.name || "Unknown");
         ctx.fillText(displayName, x + 120, y + h/2);
 
-        // Money - smaller
         ctx.font = "bold 20px 'Orbitron', Arial";
         ctx.fillStyle = "#00ff88";
         ctx.textAlign = "right";
@@ -389,11 +331,10 @@ async function drawCompactCard(ctx, user, rank, y, usersData, W) {
     }
 }
 
-// Module export
 module.exports = {
     config: {
         name: "top",
-        version: "0.0.7",
+        version: "0.0.8",
         author: "Azadx69x",
         countDown: 5,
         role: 0,
@@ -405,19 +346,16 @@ module.exports = {
 
     onStart: async function({ api, event, usersData, message }) {
         try {
-            // Set loading reaction
             if (api && event) {
                 api.setMessageReaction("⚡", event.messageID, () => {}, true);
             }
 
-            // Get all users
             const allUsers = await usersData.getAll();
             
             if (!allUsers || allUsers.length === 0) {
                 return message.reply("No users found in database!");
             }
 
-            // Sort by money and get top 15
             const sorted = allUsers
                 .map(u => ({
                     userID: u.userID,
@@ -427,37 +365,25 @@ module.exports = {
                 .sort((a, b) => b.money - a.money)
                 .slice(0, 15);
 
-            // Generate compact image
             const filePath = await drawTopBoard(sorted, usersData);
 
-            // Send message with attachment only
             await message.reply({
                 attachment: fs.createReadStream(filePath)
             });
 
-            // Success reaction
             if (api && event) {
                 api.setMessageReaction("👍🏻", event.messageID, () => {}, true);
             }
 
-            // Cleanup after 10 seconds
             setTimeout(() => {
                 try {
-                    if (fs.existsSync(filePath)) {
-                        fs.unlinkSync(filePath);
-                    }
+                    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
                 } catch (e) {}
             }, 10000);
 
         } catch(err) {
             console.error("Top command error:", err);
-            
-            if (api && event) {
-                try {
-                    api.setMessageReaction("✗", event.messageID, () => {}, true);
-                } catch (e) {}
-            }
-            
+            if (api && event) api.setMessageReaction("✗", event.messageID, () => {}, true);
             return message.reply("Error generating leaderboard. Please try again later.");
         }
     }
