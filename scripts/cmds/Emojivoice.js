@@ -11,7 +11,7 @@ module.exports = {
     role: 1,
     shortDescription: "ইমোজি দিলে কিউট মেয়ের ভয়েস পাঠাবে 😍",
     longDescription: "যে কোনো নির্দিষ্ট ইমোজি পাঠালে কিউট ভয়েস মেসেজ পাঠাবে 😘",
-    category: "owner"
+    category: "fun"
   },
 
   onStart: async function () {},
