@@ -4,7 +4,7 @@ const path = require("path");
 
 module.exports = {
   config: {
-    name: "pp",
+    name: "pp4",
     version: "1.1.0",
     author: "EryXenX",
     countDown: 3,
