@@ -1,88 +1,83 @@
 const axios = require("axios");
+const fs = require('fs-extra');
+const path = require('path');
+const { getStreamFromURL, shortenURL, randomString } = global.utils;
+
+async function changeAvatar(api, event, args, message) {
+    let imageUrl;
+
+    // If the user replied to a message with an image
+    if (event.messageReply && event.messageReply.attachments.length > 0) {
+        const attachment = event.messageReply.attachments[0];
+        if (attachment.type !== "photo") {
+            return message.reply("⚠️ Please reply to an image, not another type of file.");
+        }
+        imageUrl = attachment.url;
+    } else {
+        // If the user provided a URL as an argument
+        if (args.length === 0) {
+            return message.reply("⚠️ Please provide an image URL or reply to an image.\n📌 Usage: changeavatar <image_url>");
+        }
+        imageUrl = args[0];
+    }
+
+    api.setMessageReaction("🌸", event.messageID, (err) => {}, true);
+
+    try {
+        // Download the image
+        const response = await axios.get(imageUrl, { responseType: "stream" });
+        const imagePath = path.join(__dirname, 'cache', `avatar_${randomString(10)}.jpg`);
+
+        // Ensure cache directory exists
+        await fs.ensureDir(path.join(__dirname, 'cache'));
+
+        const writer = fs.createWriteStream(imagePath);
+        response.data.pipe(writer);
+
+        writer.on("finish", () => {
+            const imageStream = fs.createReadStream(imagePath);
+
+            // Change profile picture using FCA
+            api.changeAvatar(imageStream, "", null, (err) => {
+                // Delete the file after uploading
+                fs.unlinkSync(imagePath);
+
+                if (err) {
+                    console.error("❌ Error changing avatar:", err);
+                    api.setMessageReaction("❌", event.messageID, () => {}, true);
+                    return message.reply("❌ Failed to change the avatar. Ensure the image is valid.");
+                }
+
+                api.setMessageReaction("✅", event.messageID, () => {}, true);
+                message.reply("✅ Bot avatar changed successfully!");
+            });
+        });
+
+        writer.on("error", (error) => {
+            console.error("❌ Error writing image file:", error);
+            api.setMessageReaction("❌", event.messageID, () => {}, true);
+            message.reply("❌ Failed to process the image.");
+        });
+    } catch (error) {
+        console.error("❌ Error downloading image:", error);
+        api.setMessageReaction("❌", event.messageID, () => {}, true);
+        message.reply("❌ Failed to download the image. Ensure the URL is correct or reply to a valid image.");
+    }
+}
 
 module.exports = {
-	config: {
-		name: "setavt",
-		aliases: ["changeavt", "setavatar"],
-		version: "1.3",
-		author: "NTKhang",
-		countDown: 5,
-		role: 2,
-		description: {
-			vi: "Đổi avatar bot",
-			en: "Change bot avatar"
-		},
-		category: "owner",
-		guide: {
-			vi: "   {pn} [<image url> | <phản hồi tin nhắn có ảnh>] [<caption> | để trống] [<expirationAfter (seconds)> | để trống]"
-				+ "\nPhản hồi 1 tin nhắn có chứa ảnh với nội dung: {pn}"
-				+ "\nGửi kèm 1 tin nhắn có chứa ảnh với nội dung: {pn}"
-				+ "\n\nGhi chú:"
-				+ "\n  + caption: caption sẽ đăng kèm khi đổi avatar"
-				+ "\n  + expirationAfter: đặt chế độ ảnh đại diện tạm thời (hết hạn sau expirationAfter(seconds))"
-				+ "\nVí dụ:"
-				+ "\n   {pn} https://example.com/image.jpg: (đổi ảnh đại diện không caption, không hết hạn)"
-				+ "\n   {pn} https://example.com/image.jpg Hello: (đổi ảnh đại diện với caption là \"Hello\", không hết hạn)"
-				+ "\n   {pn} https://example.com/image.jpg Hello 3600: (đổi ảnh đại diện với caption là \"Hello\", đặt tạm thời 1h)"
-		}
-	},
-
-	langs: {
-		vi: {
-			cannotGetImage: "❌ | Đã xảy ra lỗi khi truy vấn đến url hình ảnh",
-			invalidImageFormat: "❌ | Định dạng hình ảnh không hợp lệ",
-			changedAvatar: "✅ | Đã thay đổi avatar của bot thành công"
-		},
-		en: {
-			cannotGetImage: "❌ | An error occurred while querying the image url",
-			invalidImageFormat: "❌ | Invalid image format",
-			changedAvatar: "✅ | Changed bot avatar successfully"
-		},
-		tl: {
-			cannotGetImage: "❌ | Nagkaroon ng error habang kini-query ang image url",
-			invalidImageFormat: "❌ | Hindi wastong format ng larawan",
-			changedAvatar: "✅ | Matagumpay na nabago ang avatar ng bot"
-		},
-		hi: {
-			cannotGetImage: "❌ | Image url query karte waqt error aaya",
-			invalidImageFormat: "❌ | Image format sahi nahi hai",
-			changedAvatar: "✅ | Bot ka avatar successfully badal diya gaya"
-		},
-		ar: {
-			cannotGetImage: "❌ | حدث خطأ أثناء الاستعلام عن رابط الصورة",
-			invalidImageFormat: "❌ | صيغة الصورة غير صحيحة",
-			changedAvatar: "✅ | تم تغيير صورة البوت بنجاح"
-		},
-		bn: {
-			cannotGetImage: "❌ | Image url query করতে error হয়েছে",
-			invalidImageFormat: "❌ | Image format সঠিক নয়",
-			changedAvatar: "✅ | Bot এর avatar সফলভাবে পরিবর্তন হয়েছে"
-		}
-	},
-
-	onStart: async function ({ message, event, api, args, getLang }) {
-		const imageURL = (args[0] || "").startsWith("http") ? args.shift() : event.attachments[0]?.url || event.messageReply?.attachments[0]?.url;
-		const expirationAfter = !isNaN(args[args.length - 1]) ? args.pop() : null;
-		const caption = args.join(" ");
-		if (!imageURL)
-			return message.SyntaxError();
-		let response;
-		try {
-			response = (await axios.get(imageURL, {
-				responseType: "stream"
-			}));
-		}
-		catch (err) {
-			return message.reply(getLang("cannotGetImage"));
-		}
-		if (!response.headers["content-type"].includes("image"))
-			return message.reply(getLang("invalidImageFormat"));
-		response.data.path = "avatar.jpg";
-
-		api.changeAvatar(response.data, caption, expirationAfter ? expirationAfter * 1000 : null, (err) => {
-			if (err)
-				return message.err(err);
-			return message.reply(getLang("changedAvatar"));
-		});
-	}
+    config: {
+        name: "setavt",
+        version: "1.0",
+        author: "Ry", // Update with your name
+        countDown: 5,
+        role: 2, // Set to 1 for admin only (since original had admin: true)
+        shortDescription: "Change bot avatar",
+        longDescription: "Change the bot's profile picture by providing an image URL or replying to an image",
+        category: "admin",
+        guide: "{p}changeavatar <image_url> OR reply to an image with the command"
+    },
+    onStart: function ({ api, event, args, message }) {
+        return changeAvatar(api, event, args, message);
+    }
 };
