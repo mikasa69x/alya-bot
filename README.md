@@ -28,17 +28,7 @@ Assalamu Alaikum! **GoatBot-Pro** is an enhanced fork of [Goat Bot V2](https://g
 | 🔧 **Setting Command** | Full bot config control via chat — no need to edit files manually |
 
 > ⚠️ For educational purposes only. Any misuse or illegal activity is solely the user's responsibility.
-
----
-
-## ◈ Support
-
-<div align="center">
-[![Facebook](https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://facebook.com/EryXenX)
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/EryXenX)
-[![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/@EryXenX)
-[![Telegram](https://img.shields.io/badge/Telegram-0088CC?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/EryXenX_Official)
-[![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://instagram.com/EryXenX)
+> [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://instagram.com/EryXenX)
 
 </div>
 
