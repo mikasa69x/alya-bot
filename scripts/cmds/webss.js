@@ -4,8 +4,8 @@ const path = require("path");
 
 module.exports = {
   config: {
-    name: "webss",
-    aliases: ["screenshot", "ss"],
+    name: "webss2",
+    aliases: ["screenshot2", "ss2"],
     version: "1.1",
     author: "EryXenX",
     countDown: 10,
