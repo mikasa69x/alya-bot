@@ -38,7 +38,7 @@ onStart: async function ({ api, message, args, event }) {
 await message.reply({
     body: info,
     attachment: fs.createReadStream(
-        __dirname + '/rasin/owner.jpg'
+        __dirname + '/siyam/owner.jpg'
     )
 })
 }
