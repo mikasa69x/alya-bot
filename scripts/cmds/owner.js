@@ -1,57 +1,45 @@
+const axios = require('axios')
+const { getStreamFromURL } = global.utils;
 const fs = require("fs-extra");
-const request = require("request");
-const path = require("path");
 
 module.exports = {
-  config: {
-    name: "owner",
-    version: "1.3.0",
-    author: "Mᴏʜᴀᴍᴍᴀᴅ Aᴋᴀsʜ",
-    role: 0,
-    shortDescription: "Owner information with image",
-    category: "Information",
-    guide: {
-      en: "owner"
-    }
-  },
+    config: {
+        name: 'owner',
+        version: 'v2',
+        author: 'Rasin',
+        role: 0,
+        countDown: 3,
+        prefix: false,
+        category: 'owner',
+        description: 'Show owner information'
+    },
+onStart: async function ({ api, message, args, event }) {
 
-  onStart: async function ({ api, event }) {
-    const ownerText = 
-`╭─ 👑 Oᴡɴᴇʀ Iɴғᴏ 👑 ─╮
-│ 👤 Nᴀᴍᴇ       :
-│ 🧸 Nɪᴄᴋ       : 
-│ 🎂 Aɢᴇ        : 
-│ 💘 Rᴇʟᴀᴛɪᴏɴ :
-│ 🎓 Pʀᴏғᴇssɪᴏɴ : 
-│ 📚 Eᴅᴜᴄᴀᴛɪᴏɴ : 
-│ 🏡 Lᴏᴄᴀᴛɪᴏɴ :
-├─ 🔗 Cᴏɴᴛᴀᴄᴛ ─╮
-│ 📘 Facebook  :  
-│ 💬 Messenger:  
-│ 📞 WhatsApp  : 
-╰────────────────╯`;
+    const info = `🎀 𝐎ᴡɴᴇʀ 𝐈ɴꜰᴏ ✨
+❍ ɴᴀᴍᴇ : 🩶─⃝‌‌Sɪʏꫝᴍ 🥹❤️‍🩹
+❍ ᴀɢᴇ : ᴘʀɪᴠᴀᴛᴇ 
+❍ ꜰʀᴏᴍ : ʙᴀɴɢʟᴀᴅᴇꜱʜ  🇧🇩
+❍ ᴄɪᴛʏ: ᴅʜᴀᴋᴀ 
+❍ ᴀᴅᴅʀᴇꜱꜱ: ᴘʀɪᴠᴀᴛᴇ,
+❍ ᴡᴏʀᴋ : ᴘʀɪᴠᴀᴛᴇ
+❍ ᴄʟᴀꜱꜱ : ᴘʀɪᴠᴀᴛᴇ
+❍ ʀᴇʟᴀᴛɪᴏɴꜱʜɪᴘ : ꜱɪɴɢʟᴇ
+❍ ʀᴇʟɪɢɪᴏɴ : ɪꜱʟᴀᴍ
+❍ ᴋᴀʟᴇᴍᴀ: لَا إِلٰهَ إِلَّا اللهُ مُحَمَّدٌ رَسُوْلُ اللهِ
+❍ ʀᴏʟᴇ: 🌚🙏🏻
 
-    const cacheDir = path.join(__dirname, "cache");
-    const imgPath = path.join(cacheDir, "owner.jpg");
+🎯 ᴅʀᴇᴀᴍ : ......👊🏻 
+😺 ғᴀᴠ ᴘᴇʀꜱᴏɴ : ᴍʏ ᴍᴏᴛʜᴇʀ 👀✨
+🥹 ᴄʀᴜꜱʜ : ɴᴇᴇᴅ 🙃
+🚫 ᴇx : 0 — ʙᴇᴄᴀᴜꜱᴇ ɴᴏ ᴏɴᴇ ᴅᴀʀᴇᴅ👽
+😺 ᴛɪᴍᴇ ᴘᴀꜱꜱ : ᴡᴀᴛᴄʜɪɴɢ ᴀɴɪᴍᴇ→ʟɪꜱᴛᴇɴɪɴɢ ᴛᴏ ᴍᴜꜱɪᴄ→ɢᴀᴍɪɴɢ`
 
-    if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir);
 
-    const imgLink = "https://i.imgur.com/1G4ZhU7.jpeg";
-
-    const send = () => {
-      api.sendMessage(
-        {
-          body: ownerText,
-          attachment: fs.createReadStream(imgPath)
-        },
-        event.threadID,
-        () => fs.unlinkSync(imgPath),
-        event.messageID
-      );
-    };
-
-    request(encodeURI(imgLink))
-      .pipe(fs.createWriteStream(imgPath))
-      .on("close", send);
-  }
-};
+await message.reply({
+    body: info,
+    attachment: fs.createReadStream(
+        __dirname + '/rasin/owner.jpg'
+    )
+})
+}
+}

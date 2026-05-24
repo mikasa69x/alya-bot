@@ -1,53 +1,58 @@
-const axios = require('axios'); // ✅ Axios সরাসরি import করা হয়েছে
+const axios = require('axios');
 
 module.exports = {
   config: {
     name: "imgur",
-    version: "1.0.2",
-    author: "MOHAMMAD AKASH",
+    version: "1.5.0",
+    author: "S1FU",
+    countDown: 5,
     role: 0,
-    shortDescription: "Upload image/video/GIF to Imgur and get direct links",
-    longDescription: "Reply to any image, video, or GIF to upload it to Imgur and get the link.",
-    category: "other",
-    guide: "[reply with any media file]",
-    cooldowns: 0
+    category: "utility",
+    shortDescription: { en: "ᴜᴘʟᴏᴀᴅ ᴍᴇᴅɪᴀ ᴛᴏ ɪᴍɢᴜʀ ᴠɪᴀ ᴀᴅᴠᴀɴᴄᴇᴅ ᴀᴘɪ" },
+    guide: { en: "『 ʀᴇᴘʟʏ ᴛᴏ ᴀɴ ɪᴍᴀɢᴇ ᴏʀ ᴠɪᴅᴇᴏ 』" }
   },
 
-  onStart: async function ({ api, event }) {
-    // Get API link from JSON
-    let Shaon;
-    try {
-      const apis = await axios.get('https://raw.githubusercontent.com/shaonproject/Shaon/main/api.json');
-      Shaon = apis.data.imgur;
-    } catch {
-      return api.sendMessage("❌ Failed to fetch Imgur API link!", event.threadID, event.messageID);
-    }
-
+  onStart: async function ({ api, event, message }) {
     const reply = event.messageReply;
+
     if (!reply || !reply.attachments || reply.attachments.length === 0) {
-      return api.sendMessage(
-        "Please reply to the image or video with the command Imgur...!✅",
-        event.threadID,
-        event.messageID
-      );
+      return message.reply("✧ ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴛᴏ ᴍᴇᴅɪᴀ Ი");
     }
 
-    const links = [];
+    message.reaction("🐋", event.messageID);
 
-    for (const attachment of reply.attachments) {
-      try {
-        const url = encodeURIComponent(attachment.url);
-        const upload = await axios.get(`${Shaon}/imgur?link=${url}`);
-        links.push(upload.data.uploaded.image || "❌ No link received");
-      } catch (e) {
-        links.push("❌ Failed to upload");
-      }
+    try {
+      // API Endpoint
+      const apiEndpoint = "https://maybexenos.vercel.app/uploader/imgur";
+      
+      let resultMsg = "━━〔 ɪᴍɢᴜʀ ᴜᴘʟᴏᴀᴅ 〕━\n\n";
+      
+      const uploadPromises = reply.attachments.map(async (attachment, index) => {
+        try {
+          const res = await axios.get(`${apiEndpoint}?link=${encodeURIComponent(attachment.url)}`);
+          
+          const link = res.data.uploaded.image; 
+          
+          if (link) {
+            return `ʟɪɴᴋ ${index + 1}: ${link}`;
+          } else {
+            return `ʟɪɴᴋ ${index + 1}: ᴜᴘʟᴏᴀᴅ ғᴀɪʟᴇᴅ`;
+          }
+        } catch (e) {
+          return `ʟɪɴᴋ ${index + 1}: ᴄᴏɴɴᴇᴄᴛɪᴏɴ ᴇʀʀᴏʀ`;
+        }
+      });
+
+      const results = await Promise.all(uploadPromises);
+      resultMsg += results.join("\n");
+      resultMsg += "\n\n━━━━━━━━━━━━━━━";
+
+      message.reaction("😊", event.messageID);
+      return message.reply(resultMsg);
+
+    } catch (err) {
+      message.reaction("🥲", event.messageID);
+      return message.reply("✧ sᴇʀᴠᴇʀ ᴅᴏᴡɴ ᴏʀ ɪɴᴠᴀʟɪᴅ ᴀᴘɪ ");
     }
-
-    const messageToSend = links.length === 1
-      ? links[0]
-      : `✅ Uploaded files Imgur links:\n\n${links.join("\n")}`;
-
-    return api.sendMessage(messageToSend, event.threadID, event.messageID);
   }
 };
