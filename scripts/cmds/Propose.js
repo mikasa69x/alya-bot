@@ -5,9 +5,9 @@ const { createCanvas, loadImage } = require('canvas');
 
 module.exports = {
     config: {
-        name: "propose2",
+        name: "propose",
         version: "3.0",
-        author: "xalman",
+        author: "xiyam",
         countDown: 10,
         role: 0,
         description: "Propose someone with gender-based images",
