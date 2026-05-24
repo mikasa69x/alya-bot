@@ -139,18 +139,18 @@ async function drawTopBoard(users, usersData) {
         ctx.font = "bold 60px 'Orbitron', 'Arial', sans-serif";
         ctx.fillStyle = "#ffffff";
         ctx.textAlign = "center";
-        ctx.fillText("TOP 15 RICHEST USERS", W/2, 65);
+        ctx.fillText("TOP 15 ELITE BILLIONAIRE USERS", W/2, 65);
         
         ctx.shadowColor = "#00d4ff";
         ctx.shadowBlur = 60;
         ctx.fillStyle = "rgba(255,255,255,0.3)";
-        ctx.fillText("TOP 15 RICHEST USERS", W/2, 65);
+        ctx.fillText("TOP 15 ELITE BILLIONAIRE USERS", W/2, 65);
         ctx.restore();
 
         // Subtitle - smaller
         ctx.font = "italic 24px 'Poppins', Arial";
         ctx.fillStyle = "rgba(255,255,255,0.6)";
-        ctx.fillText("Elite Billionaires Club", W/2, 95);
+        ctx.fillText("", W/2, 95);
 
         // Top 3 positions - COMPACT
         const positions = [
@@ -437,7 +437,7 @@ module.exports = {
 
             // Success reaction
             if (api && event) {
-                api.setMessageReaction("✓", event.messageID, () => {}, true);
+                api.setMessageReaction("👍🏻", event.messageID, () => {}, true);
             }
 
             // Cleanup after 10 seconds
