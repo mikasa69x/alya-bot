@@ -11,8 +11,8 @@ function formatBalance(num) {
 }
 
 module.exports.config = {
-  name: "balance",
-  aliases: ["bal"],
+  name: "balance3",
+  aliases: ["bal3"],
   version: "7.0",
   author: "MOHAMMAD AKASH",
   countDown: 5,
