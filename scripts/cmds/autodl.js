@@ -46,7 +46,7 @@ module.exports = {
                 await api.sendMessage(
                     {
                         body:
-`• 🎀 𝐌𝐞𝐝𝐢𝐚 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐞𝐝 Bby< 🎀  
+`🎀 𝐌𝐞𝐝𝐢𝐚 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐞𝐝 Bby< 🎀  
 ━━━━━━━━━━━━━━━  
 📦 sɪᴢᴇ: ${fileSizeInMB.toFixed(2)} MB  
 ━━━━━━━━━━━━━━━`,
