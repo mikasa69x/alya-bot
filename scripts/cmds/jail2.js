@@ -4,9 +4,9 @@ const path = require('path');
 
 module.exports = {
     config: {
-        name: "jail2",
+        name: "jail",
         version: "4.0.0",
-        author: "Arafat",
+        author: "Xiyam69x",
         countDown: 5,
         role: 0,
         description: "Silent Premium Jail Effect",
@@ -42,7 +42,7 @@ module.exports = {
 
             // Final Premium Delivery (No Processing Message)
             return api.sendMessage({
-                body: "𝐄𝐟𝐟𝐞𝐜𝐭 𝐣𝐚𝐢𝐥 𝐬𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥 🐸",
+                body: "𝐄𝐟𝐟𝐞𝐜𝐭 𝐣𝐚𝐢𝐥 𝐬𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥 🫩",
                 attachment: fs.createReadStream(cachePath)
             }, threadID, () => {
                 // Instant Cleanup
