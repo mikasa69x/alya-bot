@@ -16,7 +16,7 @@
 
 ## ◈ About
 
-Assalamu Alaikum! **GoatBot-Pro** is an enhanced fork of [Goat Bot V2](https://github.com/ntkhang03/Goat-Bot-V2) by **ntkhang03**, rebuilt and maintained by **EryXenX (Mohammad Akash)** with new features, multi-language support, and custom commands.
+Assalamu Alaikum! **GoatBot-Pro** is an enhanced fork of [Goat Bot V2](https://github.com/ntkhang03/Goat-Bot-V2) by **ntkhang03**, rebuilt and maintained by **Xiyamx (Mohammad Siyam)** with new features, multi-language support, and custom commands.
 
 | Feature | Description |
 |---|---|
