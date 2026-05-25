@@ -105,7 +105,7 @@ const availableTEMPLATES = {
 
 module.exports = {
   config: {
-    name: "ep",
+    name: "epfont",
     version: "1.0",
     author: "SiFu",
     countDown: 5,
@@ -114,7 +114,7 @@ module.exports = {
     longDescription: "Generate Ephoto effect using text and ID (1–100) or show all available template list",
     category: "utility",
     guide: {
-      en: "{pn} <text> - <id>\nExample: {pn} Sifu - 27\n\nView list:\n{pn} list"
+      en: "{pn} <text> - <id>\nExample: {pn} xiyam - 27\n\nView list:\n{pn} list"
     }
   },
 
