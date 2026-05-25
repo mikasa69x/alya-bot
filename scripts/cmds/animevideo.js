@@ -36,12 +36,12 @@ module.exports = {
                         noCat: "× কোনো এনিমে ক্যাটাগরি খুঁজে পাওয়া যায়নি।",
                         wait: "🐤 | এনিমে ভিডিও লোড হচ্ছে... একটু অপেক্ষা করো বেবি! <😘",
                         noVid: "× কোনো ভিডিও খুঁজে পাওয়া যায়নি!",
-                        success: "✨ | 𝐇𝐞𝐫𝐞'𝐬 𝐲𝐨𝐮𝐫 𝐚𝐧𝐢𝐦𝐞 𝐯𝐢𝐝𝐞𝐨 𝐛𝐚𝐛𝐲 <😘",
+                        success: "✨ | 𝐇𝐞𝐫𝐞'𝐬 𝐲𝐨𝐮𝐫 𝐚𝐧𝐢𝐦𝐞 𝐯𝐢𝐝𝐞𝐨 𝐛𝐚𝐛𝐲 <✨",
                         error: "× সমস্যা হয়েছে: %1। প্রয়োজনে Contact MahMUD।"
                 },
                 en: {
                         noCat: "× No anime categories found.",
-                        wait: "🐤 | Loading random anime video... Please wait baby! <😘",
+                        wait: " | Loading random anime video... Please wait baby! <😘",
                         noVid: "× No videos found.",
                         success: "✨ | 𝐇𝐞𝐫𝐞'𝐬 𝐲𝐨𝐮𝐫 𝐚𝐧𝐢𝐦𝐞 𝐯𝐢𝐝𝐞𝐨 𝐛𝐚𝐛𝐲 <😘",
                         error: "× API error: %1. Contact MahMUD for help."
