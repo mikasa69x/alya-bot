@@ -5,7 +5,7 @@ module.exports = {
     config: {
         name: "autolink",
         version: "1.3",
-        author: "MOHAMMAD AKASH",
+        author: "Xiyam69x",
         countDown: 5,
         role: 0,
         shortDescription: "Auto-download & send videos silently (no messages)",
@@ -24,7 +24,7 @@ module.exports = {
 
         const uniqueLinks = [...new Set(linkMatches)];
 
-        api.setMessageReaction("⏳", messageID, () => {}, true);
+        api.setMessageReaction("🦋", messageID, () => {}, true);
 
         let successCount = 0;
         let failCount = 0;
@@ -46,7 +46,7 @@ module.exports = {
                 await api.sendMessage(
                     {
                         body:
-`📥 ᴠɪᴅᴇᴏ ᴅᴏᴡɴʟᴏᴀᴅᴇᴅ  
+`• 🎀 𝐌𝐞𝐝𝐢𝐚 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐞𝐝 Bby< 🎀  
 ━━━━━━━━━━━━━━━  
 📦 sɪᴢᴇ: ${fileSizeInMB.toFixed(2)} MB  
 ━━━━━━━━━━━━━━━`,
@@ -64,7 +64,7 @@ module.exports = {
         }
 
         const finalReaction =
-            successCount > 0 && failCount === 0 ? "✅" :
+            successCount > 0 && failCount === 0 ? "🌸" :
             successCount > 0 ? "⚠️" : "❌";
 
         api.setMessageReaction(finalReaction, messageID, () => {}, true);
