@@ -49,20 +49,6 @@ Assalamu Alaikum! **GoatBot-Pro** is an enhanced fork of [Goat Bot V2](https://g
 
 <div align="center">
 
-### 📹 Watch Before You Start
-
-<a href="https://youtu.be/gPf_BFhQz_w?si=-iknmkmFd_NcRahY">
-  <img src="https://img.youtube.com/vi/gPf_BFhQz_w/maxresdefault.jpg" alt="GoatBot-Pro Setup Tutorial" width="680" />
-</a>
-
-<br/>
-
-[![Watch Tutorial](https://img.shields.io/badge/▶%20Watch%20Full%20Setup%20Tutorial-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/gPf_BFhQz_w?si=-iknmkmFd_NcRahY)
-
-</div>
-
----
-
 ## ◈ Setup
 
 ```bash
