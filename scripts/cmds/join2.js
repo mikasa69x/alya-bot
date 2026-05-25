@@ -1,7 +1,7 @@
 module.exports = {
   config: {
-    name: "join",
-    aliases: ["boxlist", "allbox"],
+    name: "join2",
+    aliases: ["boxlist", "allbox1"],
     version: "1.5.0",
     author: "MOHAMMAD AKASH",
     role: 2,
