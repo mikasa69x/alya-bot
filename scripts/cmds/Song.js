@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = {
   config: {
-    name: 'song2',
+    name: 'song',
     author: 'Nyx',
     usePrefix: false,
     category: 'music'
@@ -65,7 +65,7 @@ module.exports = {
         writer.on('error', reject);
       });
 
-      api.setMessageReaction("✅", event.messageID, () => {}, true);
+      api.setMessageReaction("✨", event.messageID, () => {}, true);
 
       await message.reply({
         body: `🎧 Now playing: ${selectedVideo.title}\nDuration: ${selectedVideo.timestamp}`,
