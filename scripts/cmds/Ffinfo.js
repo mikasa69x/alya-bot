@@ -5,7 +5,7 @@ module.exports = {
     name: "ffinfo",
     aliases: ["freefireinfo"],
     version: "1.2",
-    author: "xalman",
+    author: "xiyam",
     countDown: 5,
     role: 0,
     shortDescription: { en: "Detailed Free Fire player profile info" },
@@ -66,7 +66,7 @@ module.exports = {
         msg += `💎 𝗗𝗶𝗮𝗺𝗼𝗻𝗱 𝗖𝗼𝘀𝘁: n/a \n`;
         msg += `👕 𝗖𝗹𝗼𝘁𝗵𝗲𝘀 𝗘𝗾𝘂𝗶𝗽𝗽𝗲𝗱: ${otherInfo.equippedClothesCount}\n`;
         msg += `━━━━━━━━━━━━━━━━━━\n`;
-        msg += `✨ 𝗢𝗽𝗲𝗿𝗮𝘁𝗼𝗿: ${operator}`;
+        msg += `✨ 𝗢𝗽𝗲𝗿𝗮𝘁𝗼𝗿: xiyam`;
 
         return message.reply(msg);
       } else {
