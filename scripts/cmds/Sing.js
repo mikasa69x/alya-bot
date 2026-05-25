@@ -2,14 +2,14 @@ const axios = require('axios');
 
 module.exports = {
   config: {
-    name: "sing2",
+    name: "sing",
     version: "2.6",
-    author: "xalman",
+    author: "xiyam",
     countDown: 5,
     role: 0,
     shortDescription: "Search, Link, or Reply to download MP3",
     longDescription: "Download MP3 by searching, providing a link, or replying to a link.",
-    category: "download",
+    category: "music",
     guide: "{p}sing <name> OR {p}sing <link> OR reply to a link with {p}sing"
   },
 
