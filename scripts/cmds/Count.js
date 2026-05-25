@@ -1,8 +1,8 @@
 module.exports = {
 	config: {
 		name: "count",
-		version: "2.8",
-		author: "Ewr SiFu",
+		version: "3.0",
+		author: "xiyam",
 		countDown: 10,
 		role: 0,
 		description: {
@@ -18,9 +18,6 @@ module.exports = {
 				+ "\n   {pn} [reply]: View activity card of the replied user."
 				+ "\n   {pn} @tag: View the activity card of tagged users."
 				+ "\n   {pn} all: View the leaderboard of all members."
-		},
-		envConfig: {
-			"ACCESS_TOKEN": "6628568379%7Cc1e620fa708a1d5696fb991c1bde5662"
 		}
 	},
 
@@ -57,10 +54,6 @@ module.exports = {
 			media: "Media",
 			fallbackName: "Facebook User"
 		}
-	},
-
-	onLoad: async function () {
-		// No font registration needed to avoid "Can't find text" errors
 	},
 
 	onChat: async function ({ event, threadsData, usersData }) {
@@ -127,7 +120,7 @@ module.exports = {
 		writeJsonSync(dataPath, activityData, { spaces: 2 });
 	},
 
-	onStart: async function ({ args, threadsData, message, event, api, getLang, envCommands }) {
+	onStart: async function ({ args, threadsData, message, event, api, getLang }) {
 		const { Canvas, loadImage } = require("canvas");
 		const { resolve } = require("path");
 		const { createWriteStream, readJsonSync, ensureFileSync } = require("fs-extra");
@@ -135,7 +128,8 @@ module.exports = {
 		const moment = require("moment-timezone");
 		const { threadID, senderID, mentions, type, messageReply } = event;
 
-		const ACCESS_TOKEN = envCommands.count.ACCESS_TOKEN;
+		// FIXED: Direct access token instead of envCommands
+		const ACCESS_TOKEN = "6628568379%7Cc1e620fa708a1d5696fb991c1bde5662";
 		const BACKGROUND_URL = "https://i.imgur.com/YW7fgf1.jpeg";
 
 		const threadData = await threadsData.get(threadID);
@@ -186,7 +180,7 @@ module.exports = {
 		const getAvatar = async (uid, name) => {
 			try {
 				const url = `https://graph.facebook.com/${uid}/picture?width=512&height=512&access_token=${ACCESS_TOKEN}`;
-				const response = await axios.get(url, { responseType: 'arraybuffer' });
+				const response = await axios.get(url, { responseType: 'arraybuffer', timeout: 10000 });
 				return await loadImage(response.data);
 			} catch (error) {
 				const canvas = new Canvas(512, 512);
@@ -200,17 +194,6 @@ module.exports = {
 				ctx.fillText(name.charAt(0).toUpperCase(), 256, 256);
 				return await loadImage(canvas.toBuffer());
 			}
-		};
-
-		// Fixed Drawing Function to use System Fonts
-		const drawGlowingText = (ctx, text, x, y, color, size, blur = 15) => {
-			if (!text || text === "") return;
-			ctx.font = `bold ${size}px sans-serif`;
-			ctx.shadowColor = color;
-			ctx.shadowBlur = blur;
-			ctx.fillStyle = color;
-			ctx.fillText(text, x, y);
-			ctx.shadowBlur = 0;
 		};
 
 		const fitText = (ctx, text, maxWidth) => {
@@ -304,7 +287,7 @@ module.exports = {
 				ctx.fillStyle = '#FFFFFF';
 				ctx.fillText(fitText(ctx, user.name, 350), 210, currentY + 58);
 				const barWidth = 350;
-                const barX = 700;
+				const barX = 700;
 				const progress = (user.count / (top3[0]?.count || user.count)) * barWidth;
 				ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
 				ctx.fillRect(barX, currentY + 35, barWidth, 20);
@@ -427,7 +410,7 @@ module.exports = {
 				ctx.fillText(getLang("dailyActivity"), 50, 700);
 				
 				const graphX = 80, graphW = 640, graphH = 120;
-                const graphY = 850;
+				const graphY = 850;
 				ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
 				ctx.lineWidth = 1;
 				ctx.strokeRect(graphX, graphY - graphH, graphW, graphH);
@@ -462,8 +445,8 @@ module.exports = {
 					{ label: getLang("media"), value: types.media, color: '#F4E409' }
 				];
 				
-                const donutY = 1025;
-                const donutR = 60;
+				const donutY = 1025;
+				const donutR = 60;
 				const donutX = 200;
 				let startAngle = -0.5 * Math.PI;
 
