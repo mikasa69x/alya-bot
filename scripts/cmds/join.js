@@ -1,9 +1,9 @@
 module.exports = {
   config: {
-    name: "join2",
+    name: "join",
     aliases: ["boxlist", "allbox1"],
     version: "1.5.0",
-    author: "MOHAMMAD AKASH",
+    author: "xiyam69x",
     role: 2,
     shortDescription: "Paginated active group list & add yourself",
     category: "system",
@@ -93,7 +93,7 @@ module.exports = {
       const addUserToGroup = async (uid, tid, name) => {
         try {
           await api.addUserToGroup(uid, tid);
-          await api.sendMessage(`✅ Aᴅᴅᴇᴅ Yᴏᴜ Tᴏ: ${name}`, event.threadID);
+          await api.sendMessage(`✨ Aᴅᴅᴇᴅ Yᴏᴜ Tᴏ: ${name}`, event.threadID);
         } catch {
           await api.sendMessage(`❌ Fᴀɪʟᴅ Tᴏ Aᴅᴅ Yᴏᴜ ᴛᴏ: ${name}`, event.threadID);
         }
