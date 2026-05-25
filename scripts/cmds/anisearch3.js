@@ -2,8 +2,8 @@ const axios = require("axios");
 
 module.exports = {
   config: {
-    name: "anisearch3",
-    aliases: ["amv3", "animesearch3"],
+    name: "anisearch2",
+    aliases: ["amv2", "animesearch2"],
     version: "1.0",
     author: "xalman",
     countDown: 3,
