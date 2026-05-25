@@ -2,7 +2,7 @@ const moment = require("moment-timezone");
 
 module.exports = {
   config: {
-    name: "allbox",
+    name: "listbox",
     version: "1.0.0",
     author: "MOHAMMAD AKASH",
     countDown: 60,
