@@ -2,8 +2,8 @@ const axios = require("axios");
 
 module.exports = {
   config: {
-    name: "ffinfo2",
-    aliases: ["freefireinfo2"],
+    name: "ffinfo",
+    aliases: ["freefireinfo"],
     version: "1.2",
     author: "xalman",
     countDown: 5,
