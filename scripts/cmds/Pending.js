@@ -34,7 +34,7 @@ module.exports = {
     const { threadID, messageID } = event;
 
     const prefix    = global.GoatBot?.config?.prefix || ".";
-    const botName   = "─⃝‌‌愛ᴍɪᴋᴀsᴀ вαву♡影💌🦋 くめ";
+    const botName   = "─⃝‌‌愛ᴀʟʏᴀ вαву♡影💌 くめ";
     const heartLine = "✦──── ⋆⋅☆⋅⋆ ────✦";
     const timeNow   = moment().tz("Asia/Dhaka").format("ddd, DD MMM YYYY • HH:mm:ss");
 
