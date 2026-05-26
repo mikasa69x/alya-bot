@@ -16,8 +16,8 @@ async function stream(url) {
 
 module.exports = {
   config: {
-    name: "tiktok",
-    aliases: ["tt"],
+    name: "tiktok1",
+    aliases: ["tt1"],
     version: "1.1.0",
     author: "Mᴏʜᴀᴍᴍᴀᴅ Aᴋᴀsʜ",
     role: 0,
