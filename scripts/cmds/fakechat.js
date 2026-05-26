@@ -1,5 +1,5 @@
 const axios = require("axios");
-const fs = require("fs-extra");
+const fs = require("fs");
 const path = require("path");
 const { createCanvas, loadImage } = require("canvas");
 
@@ -11,7 +11,6 @@ function wrapText(ctx, text, maxWidth) {
   const words = text.split(" ");
   const lines = [];
   let line = "";
-
   for (const word of words) {
     const probe = line ? `${line} ${word}` : word;
     if (ctx.measureText(probe).width > maxWidth && line !== "") {
@@ -55,13 +54,11 @@ function drawFallbackAvatar(ctx, name, cx, cy, radius) {
   ctx.arc(cx, cy, radius, 0, Math.PI * 2);
   ctx.closePath();
   ctx.clip();
-
   const grad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
-  grad.addColorStop(0, "#4F8EF7");
-  grad.addColorStop(1, "#8B5CF6");
+  grad.addColorStop(0, "#FF6B9D");
+  grad.addColorStop(1, "#FF1744");
   ctx.fillStyle = grad;
   ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
-
   ctx.fillStyle = "#FFFFFF";
   ctx.font = `bold ${radius}px sans-serif`;
   ctx.textAlign = "center";
@@ -77,14 +74,79 @@ async function fetchAvatar(uid) {
 }
 
 // ─────────────────────────────────────────────
-//  CANVAS RENDERER
+//  DRAW FLOATING HEARTS (background deco)
+// ─────────────────────────────────────────────
+
+function drawHeart(ctx, x, y, size, color, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x, y + size / 4);
+  ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + size / 4);
+  ctx.bezierCurveTo(x - size / 2, y + size / 2, x, y + size * 0.75, x, y + size);
+  ctx.bezierCurveTo(x, y + size * 0.75, x + size / 2, y + size / 2, x + size / 2, y + size / 4);
+  ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + size / 4);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawBackgroundHearts(ctx, width, height) {
+  // Fixed decorative hearts scattered in background
+  const hearts = [
+    { x: 30,  y: 10,  size: 10, color: "#FF6B9D", alpha: 0.25 },
+    { x: 120, y: 5,   size: 7,  color: "#FF1744", alpha: 0.18 },
+    { x: 200, y: 15,  size: 12, color: "#FF6B9D", alpha: 0.20 },
+    { x: 310, y: 8,   size: 8,  color: "#FFB3C6", alpha: 0.22 },
+    { x: 420, y: 12,  size: 10, color: "#FF1744", alpha: 0.15 },
+    { x: 510, y: 6,   size: 7,  color: "#FF6B9D", alpha: 0.20 },
+    { x: 570, y: 18,  size: 9,  color: "#FFB3C6", alpha: 0.18 },
+    { x: 60,  y: height - 20, size: 8,  color: "#FF6B9D", alpha: 0.18 },
+    { x: 150, y: height - 15, size: 10, color: "#FF1744", alpha: 0.15 },
+    { x: 280, y: height - 18, size: 7,  color: "#FFB3C6", alpha: 0.20 },
+    { x: 400, y: height - 12, size: 9,  color: "#FF6B9D", alpha: 0.18 },
+    { x: 530, y: height - 20, size: 8,  color: "#FF1744", alpha: 0.15 },
+  ];
+  for (const h of hearts) {
+    drawHeart(ctx, h.x, h.y, h.size, h.color, h.alpha);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  LOVE REACTION BADGE
+// ─────────────────────────────────────────────
+
+function drawLoveReaction(ctx, x, y) {
+  // Small heart reaction badge at bottom of bubble
+  const SIZE = 18;
+  ctx.save();
+  // Badge circle bg
+  ctx.beginPath();
+  ctx.arc(x, y, SIZE / 2 + 3, 0, Math.PI * 2);
+  ctx.fillStyle = "#1A0A10";
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x, y, SIZE / 2 + 2, 0, Math.PI * 2);
+  ctx.fillStyle = "#FF1744";
+  ctx.fill();
+  // Heart inside
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = `${SIZE - 6}px sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("❤️", x, y + 1);
+  ctx.restore();
+}
+
+// ─────────────────────────────────────────────
+//  CANVAS RENDERER — LOVE THEME
 // ─────────────────────────────────────────────
 
 async function buildFakeChatImage(avatarImg, displayName, messageText) {
   const WIDTH        = 620;
   const H_PAD        = 18;
-  const V_PAD        = 16;
-  const AVATAR_R     = 24;
+  const V_PAD        = 20;
+  const AVATAR_R     = 26;
   const AVATAR_D     = AVATAR_R * 2;
   const GAP          = 12;
   const BUBBLE_X     = H_PAD + AVATAR_D + GAP;
@@ -92,11 +154,12 @@ async function buildFakeChatImage(avatarImg, displayName, messageText) {
   const NAME_FONT    = "bold 14px sans-serif";
   const MSG_FONT     = "15px sans-serif";
   const NAME_H       = 20;
-  const LINE_H       = 22;
-  const B_PAD_X      = 14;
-  const B_PAD_Y      = 10;
+  const LINE_H       = 23;
+  const B_PAD_X      = 16;
+  const B_PAD_Y      = 12;
+  const REACTION_H   = 20; // extra space below bubble for reaction badge
 
-  // Measure on scratch canvas
+  // Measure text
   const scratch = createCanvas(WIDTH, 100);
   const sCtx    = scratch.getContext("2d");
 
@@ -109,24 +172,53 @@ async function buildFakeChatImage(avatarImg, displayName, messageText) {
   sCtx.font = MSG_FONT;
   const maxLineW = Math.max(nameW, ...lines.map(l => sCtx.measureText(l).width));
 
-  const BUBBLE_W = Math.min(BUBBLE_MAX_W, maxLineW + B_PAD_X * 2 + 4);
+  const BUBBLE_W = Math.min(BUBBLE_MAX_W, maxLineW + B_PAD_X * 2 + 6);
   const BUBBLE_H = B_PAD_Y + NAME_H + lines.length * LINE_H + B_PAD_Y;
-  const HEIGHT   = Math.max(AVATAR_D + V_PAD * 2, BUBBLE_H + V_PAD * 2) + 20;
+  const HEIGHT   = Math.max(AVATAR_D + V_PAD * 2, BUBBLE_H + V_PAD * 2) + REACTION_H + 16;
 
   const canvas = createCanvas(WIDTH, HEIGHT);
   const ctx    = canvas.getContext("2d");
 
-  // Background
-  ctx.fillStyle = "#121212";
+  // ── Background: deep romantic dark gradient ──
+  const bgGrad = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
+  bgGrad.addColorStop(0,   "#1A0008");
+  bgGrad.addColorStop(0.5, "#2D0018");
+  bgGrad.addColorStop(1,   "#1A000F");
+  ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-  // Top divider
-  ctx.fillStyle = "#2A2A2A";
-  ctx.fillRect(0, 0, WIDTH, 1);
+  // Subtle pink vignette overlay
+  const vigGrad = ctx.createRadialGradient(WIDTH / 2, HEIGHT / 2, 0, WIDTH / 2, HEIGHT / 2, WIDTH * 0.8);
+  vigGrad.addColorStop(0,   "rgba(255,107,157,0)");
+  vigGrad.addColorStop(1,   "rgba(180,0,50,0.18)");
+  ctx.fillStyle = vigGrad;
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-  // ── Avatar ──────────────────────────────────
+  // Decorative hearts in background
+  drawBackgroundHearts(ctx, WIDTH, HEIGHT);
+
+  // ── Top glowing line ────────────────────────
+  const lineGrad = ctx.createLinearGradient(0, 0, WIDTH, 0);
+  lineGrad.addColorStop(0,   "rgba(255,23,68,0)");
+  lineGrad.addColorStop(0.5, "rgba(255,23,68,0.7)");
+  lineGrad.addColorStop(1,   "rgba(255,23,68,0)");
+  ctx.fillStyle = lineGrad;
+  ctx.fillRect(0, 0, WIDTH, 2);
+
+  // ── Avatar ───────────────────────────────────
   const avatarCX = H_PAD + AVATAR_R;
   const avatarCY = V_PAD + AVATAR_R;
+
+  // Avatar glow ring (love pink)
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(avatarCX, avatarCY, AVATAR_R + 4, 0, Math.PI * 2);
+  const ringGrad = ctx.createRadialGradient(avatarCX, avatarCY, AVATAR_R, avatarCX, avatarCY, AVATAR_R + 4);
+  ringGrad.addColorStop(0, "rgba(255,23,68,0.6)");
+  ringGrad.addColorStop(1, "rgba(255,23,68,0)");
+  ctx.fillStyle = ringGrad;
+  ctx.fill();
+  ctx.restore();
 
   if (avatarImg) {
     drawCircleImage(ctx, avatarImg, avatarCX, avatarCY, AVATAR_R);
@@ -134,14 +226,13 @@ async function buildFakeChatImage(avatarImg, displayName, messageText) {
     drawFallbackAvatar(ctx, displayName, avatarCX, avatarCY, AVATAR_R);
   }
 
-  // Online dot border
+  // Online dot (love red)
   ctx.save();
-  ctx.fillStyle = "#121212";
+  ctx.fillStyle = "#1A0008";
   ctx.beginPath();
   ctx.arc(avatarCX + AVATAR_R - 5, avatarCY + AVATAR_R - 5, 7, 0, Math.PI * 2);
   ctx.fill();
-  // Online dot
-  ctx.fillStyle = "#31A24C";
+  ctx.fillStyle = "#FF1744";
   ctx.beginPath();
   ctx.arc(avatarCX + AVATAR_R - 5, avatarCY + AVATAR_R - 5, 5, 0, Math.PI * 2);
   ctx.fill();
@@ -150,32 +241,39 @@ async function buildFakeChatImage(avatarImg, displayName, messageText) {
   // ── Chat Bubble ──────────────────────────────
   const BUBBLE_Y = V_PAD;
 
-  // Shadow
+  // Bubble glow behind
   ctx.save();
-  ctx.shadowColor   = "rgba(0,0,0,0.45)";
-  ctx.shadowBlur    = 12;
+  ctx.shadowColor   = "rgba(255,23,68,0.35)";
+  ctx.shadowBlur    = 20;
   ctx.shadowOffsetY = 4;
-  roundRect(ctx, BUBBLE_X, BUBBLE_Y, BUBBLE_W, BUBBLE_H, 18);
-  ctx.fillStyle = "#2C2C2E";
+  roundRect(ctx, BUBBLE_X, BUBBLE_Y, BUBBLE_W, BUBBLE_H, 20);
+  // Bubble gradient fill
+  const bubbleGrad = ctx.createLinearGradient(BUBBLE_X, BUBBLE_Y, BUBBLE_X + BUBBLE_W, BUBBLE_Y + BUBBLE_H);
+  bubbleGrad.addColorStop(0, "#3D0020");
+  bubbleGrad.addColorStop(1, "#2A0016");
+  ctx.fillStyle = bubbleGrad;
   ctx.fill();
   ctx.restore();
 
-  // Border
-  roundRect(ctx, BUBBLE_X, BUBBLE_Y, BUBBLE_W, BUBBLE_H, 18);
-  ctx.strokeStyle = "#3A3A3C";
-  ctx.lineWidth   = 1;
+  // Bubble border — glowing pink stroke
+  roundRect(ctx, BUBBLE_X, BUBBLE_Y, BUBBLE_W, BUBBLE_H, 20);
+  const borderGrad = ctx.createLinearGradient(BUBBLE_X, BUBBLE_Y, BUBBLE_X + BUBBLE_W, BUBBLE_Y + BUBBLE_H);
+  borderGrad.addColorStop(0, "rgba(255,107,157,0.7)");
+  borderGrad.addColorStop(1, "rgba(255,23,68,0.4)");
+  ctx.strokeStyle = borderGrad;
+  ctx.lineWidth   = 1.5;
   ctx.stroke();
 
-  // ── Name ────────────────────────────────────
+  // ── Name ─────────────────────────────────────
   ctx.font         = NAME_FONT;
-  ctx.fillStyle    = "#4F8EF7";
+  ctx.fillStyle    = "#FF6B9D";
   ctx.textAlign    = "left";
   ctx.textBaseline = "top";
   ctx.fillText(displayName, BUBBLE_X + B_PAD_X, BUBBLE_Y + B_PAD_Y);
 
   // ── Message Lines ─────────────────────────────
   ctx.font      = MSG_FONT;
-  ctx.fillStyle = "#F2F2F7";
+  ctx.fillStyle = "#FFE4ED";
 
   for (let i = 0; i < lines.length; i++) {
     ctx.fillText(
@@ -190,17 +288,28 @@ async function buildFakeChatImage(avatarImg, displayName, messageText) {
   const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
 
   ctx.font         = "11px sans-serif";
-  ctx.fillStyle    = "#8E8E93";
+  ctx.fillStyle    = "#FF6B9D";
   ctx.textAlign    = "right";
   ctx.textBaseline = "bottom";
   ctx.fillText(timeStr, BUBBLE_X + BUBBLE_W - B_PAD_X / 2, BUBBLE_Y + BUBBLE_H - 5);
 
-  // ── Seen indicator ────────────────────────────
+  // ── Seen ──────────────────────────────────────
   ctx.font         = "11px sans-serif";
-  ctx.fillStyle    = "#4F8EF7";
+  ctx.fillStyle    = "#FF6B9D";
   ctx.textAlign    = "right";
   ctx.textBaseline = "top";
-  ctx.fillText("Seen", BUBBLE_X + BUBBLE_W - B_PAD_X / 2, BUBBLE_Y + BUBBLE_H + 4);
+  ctx.fillText("Seen ❤️", BUBBLE_X + BUBBLE_W - B_PAD_X / 2, BUBBLE_Y + BUBBLE_H + 5);
+
+  // ── Love Reaction Badge ───────────────────────
+  drawLoveReaction(ctx, BUBBLE_X + 24, BUBBLE_Y + BUBBLE_H - 4);
+
+  // ── Bottom glow line ──────────────────────────
+  const bottomGrad = ctx.createLinearGradient(0, HEIGHT - 2, WIDTH, HEIGHT - 2);
+  bottomGrad.addColorStop(0,   "rgba(255,23,68,0)");
+  bottomGrad.addColorStop(0.5, "rgba(255,23,68,0.5)");
+  bottomGrad.addColorStop(1,   "rgba(255,23,68,0)");
+  ctx.fillStyle = bottomGrad;
+  ctx.fillRect(0, HEIGHT - 2, WIDTH, 2);
 
   return canvas.toBuffer("image/png");
 }
@@ -213,14 +322,14 @@ module.exports = {
   config: {
     name: "fakechat",
     aliases: ["fc", "fake", "ফেকচ্যাট"],
-    version: "1.0",
+    version: "2.0",
     author: "MahMUD",
     countDown: 5,
     role: 0,
-    shortDescription: { en: "Generate a fake Messenger chat image" },
+    shortDescription: { en: "Generate a fake Messenger chat with Love theme" },
     longDescription: {
-      en: "Generate a realistic fake Facebook Messenger chat message image for any user.",
-      bn: "যেকোনো ইউজারের জন্য নকল মেসেঞ্জার চ্যাট ইমেজ তৈরি করুন।"
+      en: "Generate a realistic fake Facebook Messenger chat with a romantic Love theme.",
+      bn: "রোমান্টিক Love থিমে নকল মেসেঞ্জার চ্যাট ইমেজ তৈরি করুন।"
     },
     category: "fun",
     guide: {
@@ -233,13 +342,13 @@ module.exports = {
     en: {
       noTarget: "❌ Please @mention someone, reply to a message, or provide a UID.",
       noText  : "❌ Please include the message text you want to fake.",
-      success : "🗨️ Fake chat created for: %1",
+      success : "💕 Love chat created for: %1",
       error   : "⚠️ Something went wrong: %1"
     },
     bn: {
       noTarget: "❌ কাউকে মেনশন করো, রিপ্লাই দাও, অথবা UID দাও।",
       noText  : "❌ কী মেসেজ দেখাতে চাও সেটা লিখো।",
-      success : "🗨️ ফেক চ্যাট তৈরি হয়েছে: %1 এর জন্য",
+      success : "💕 লাভ চ্যাট তৈরি হয়েছে: %1 এর জন্য",
       error   : "⚠️ সমস্যা হয়েছে: %1"
     }
   },
