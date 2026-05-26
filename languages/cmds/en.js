@@ -4,7 +4,7 @@ module.exports = {
 		description: "turn on/off only admin box can use bot",
 		guide: "   {pn} [on | off]",
 		text: {
-			turnedOn: "Turned on the mode only admin of group can use bot",
+			turnedOn: "Turned on the mode only admin of group can use bot😴",
 			turnedOff: "Turned off the mode only admin of group can use bot",
 			syntaxError: "Syntax error, only use {pn} on or {pn} off"
 		}
@@ -40,7 +40,7 @@ module.exports = {
 		description: "turn on/off only admin can use bot",
 		guide: "{pn} [on | off]",
 		text: {
-			turnedOn: "Turned on the mode only admin can use bot",
+			turnedOn: "Turned on the mode only admin can use bot😴👍🏻",
 			turnedOff: "Turned off the mode only admin can use bot",
 			syntaxError: "Syntax error, only use {pn} on or {pn} off"
 		}
@@ -620,7 +620,7 @@ module.exports = {
 		description: "Unsend bot's message",
 		guide: "reply the message you want to unsend and call the command {pn}",
 		text: {
-			syntaxError: "Please reply the message you want to unsend"
+			syntaxError: "Please reply the message you want to unsend🫴🏻"
 		}
 	},
 	user: {
