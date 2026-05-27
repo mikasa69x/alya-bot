@@ -29,7 +29,7 @@ module.exports = {
       } else if (event.messageReply) {
         targetID = event.messageReply.senderID;
       } else {
-        return message.reply("❌ কাকে কিক মারবি? মেনশন দে অথবা রিপ্লাই করে কমান্ড দে!");
+        return message.reply("Please mention someone!");
       }
 
       const senderID = event.senderID;
