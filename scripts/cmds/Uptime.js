@@ -8,7 +8,7 @@ const path = require('path');
 
 module.exports = {
   config: {
-    name: "uptime2",
+    name: "uptime",
     version: "3.0",
     role: 0,
     author: "xalman",
