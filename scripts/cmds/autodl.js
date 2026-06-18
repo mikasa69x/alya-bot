@@ -25,7 +25,7 @@ module.exports = {
     version: "2.0",
     author: "Xiyam69x",
     countDown: 5,
-    role: 0,
+    role: 1,
     shortDescription: { en: "Auto-download & send videos with platform info" },
     longDescription: { en: "Automatically detects links, downloads videos and replies with platform name and file size" },
     category: "media"
@@ -62,11 +62,11 @@ module.exports = {
         const fileSizeMB   = stats.size / (1024 * 1024);
 
         // ── File too large ──────────────────────────────────────────────────
-        if (fileSizeMB > 25) {
+        if (fileSizeMB > 35) {
           fs.unlinkSync(filePath);
           // Reply with size error
           api.sendMessage({
-            body: `${platform.emoji} ${platform.name} থেকে ডাউনলোড হয়েছে কিন্তু পাঠানো সম্ভব হয়নি!\n━━━━━━━━━━━━━━━\n📦 sɪᴢᴇ: ${fileSizeMB.toFixed(2)} MB (25MB এর বেশি)\n❌ ফাইল সাইজ লিমিট পার হয়েছে`,
+            body: `${platform.emoji} ${platform.name} থেকে ডাউনলোড হয়েছে কিন্তু পাঠানো সম্ভব হয়নি!\n━━━━━━━━━━━━━━━\n📦 sɪᴢᴇ: ${fileSizeMB.toFixed(2)} MB (35MB এর বেশি)\n❌ ফাইল সাইজ লিমিট পার হয়েছে`,
             messageID
           }, threadID, undefined, messageID);
           failCount++;
@@ -95,7 +95,7 @@ module.exports = {
       } catch (err) {
         // ── Reply with error for this specific link ──────────────────────────
         api.sendMessage(
-          { body: `${platform.emoji} ${platform.name} থেকে ডাউনলোড করা যায়নি!\n━━━━━━━━━━━━━━━\n❌ ${err.message || "Unknown error"}` },
+          { body: `${platform.emoji} ${platform.name} !\n━━━━━━━━━━━━━━━\n❌ ${err.message || "Unknown error"}` },
           threadID,
           undefined,
           messageID  // reply to original message
