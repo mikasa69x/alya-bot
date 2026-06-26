@@ -75,8 +75,8 @@ function levelToExp(level, deltaNext = 5) {
 
 module.exports = {
   config: {
-    name: "spy3",
-    aliases: ["spy3"],
+    name: "spy3্",
+    aliases: ["spy"],
     version: "2.0",
     author: "Rômeo",
     countDown: 5,
