@@ -95,7 +95,7 @@ module.exports = {
       } catch (err) {
         // ── Reply with error for this specific link ──────────────────────────
         api.sendMessage(
-          { body: `${platform.emoji} ${platform.name} !\n━━━━━━━━━━━━━━━\n❌ ${err.message || "Unknown error"}` },
+          { body: `${platform.emoji} ${platform.name} !\n━━━━━━━━━━━━━━━\n ${err.message || ""}` },
           threadID,
           undefined,
           messageID  // reply to original message
