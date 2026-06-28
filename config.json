@@ -47,7 +47,7 @@
   },
   "database": {
     "type": "mongodb",
-    "uriMongodb": "mongodb+srv://eryxenxdb:eryxenxdbgoatv2@cluster0.523a3n0.mongodb.net/?appName=Cluster0",
+    "uriMongodb": "mongodb+srv://arafatas9999:Arafat69@arafat.9sc1rkl.mongodb.net/?retryWrites=true&w=majority&appName=Arafat",
     "autoSyncWhenStart": false,
     "autoRefreshThreadInfoFirstTime": true,
     "notes": "Recommended using 'mongodb' or 'sqlite'."
